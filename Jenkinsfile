@@ -2,12 +2,13 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
-            steps {
-                // Check out the repository
-                checkout scm
-            }
-        }
+stage('Checkout') {
+    steps {
+        // Check out the repository using SSH key
+        checkout([$class: 'GitSCM', branches: [[name: '*/master']], userRemoteConfigs: [[url: 'git@github.com:Shoeb-K/simple-web-app']], extensions: [[$class: 'CleanBeforeCheckout']], credentialsId: 'GitHubSSH'])
+    }
+}
+
 
         stage('Build') {
             steps {
