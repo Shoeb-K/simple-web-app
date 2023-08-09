@@ -5,7 +5,7 @@ pipeline {
 stage('Checkout') {
     steps {
         // Check out the repository using SSH key
-        checkout([$class: 'GitSCM', branches: [[name: '*/master']], userRemoteConfigs: [[url: 'git@github.com:Shoeb-K/simple-web-app']], extensions: [[$class: 'CleanBeforeCheckout']], credentialsId: 'GitHubSSH'])
+        checkout([$class: 'GitSCM', branches: [[name: '*/master']], userRemoteConfigs: [[url: 'git@github.com:Shoeb-K/simple-web-app.git']], extensions: [[$class: 'CleanBeforeCheckout']], credentialsId: 'GitHubSSH'])
     }
 }
 
