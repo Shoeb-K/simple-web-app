@@ -22,8 +22,8 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 sh 'echo "Pushing Docker image..."'
-                withCredentials([string(credentialsId: 'docker-hub-credentials', variable: 'DOCKER_HUB_CREDENTIALS')]) {
-                    sh "docker login -u ${DOCKER_HUB_CREDENTIALS_USR} -p ${DOCKER_HUB_CREDENTIALS_PSW}"
+                withCredentials([string(credentialsId: 'dockerhub_id', variable: 'DOCKER_HUB_CREDENTIALS')]) {
+                    sh "docker login -u ${beastyee06} -p ${Beast@006}"
                 }
                 sh "docker push simple-web-app:${BUILD_NUMBER}"
             }
