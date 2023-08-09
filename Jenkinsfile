@@ -4,35 +4,49 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                // Check out the repository
                 checkout scm
             }
         }
-        stage('Build and Test') {
+
+        stage('Build') {
             steps {
-                sh 'echo "Building and testing the web application..."'
-                // Add build and test commands here
-            }
-        }
-        stage('Build Docker Image') {
-            steps {
-                sh 'echo "Building Docker image..."'
-                sh 'docker build -t simple-web-app:${BUILD_NUMBER} .'
-            }
-        }
-        stage('Push Docker Image') {
-            steps {
-                sh 'echo "Pushing Docker image..."'
-                withCredentials([string(credentialsId: 'dockerhub_id', variable: 'DOCKER_HUB_CREDENTIALS')]) {
-                    sh "docker login -u ${beastyee06} -p ${Beast@006}"
+                script {
+                    // Build the Docker image
+                    def imageName = "simple-web-app:${env.BUILD_NUMBER}"
+                    docker.build(imageName, '.')
                 }
-                sh "docker push simple-web-app:${BUILD_NUMBER}"
             }
         }
-        stage('Deploy to Docker') {
+
+        stage('Push to Docker Hub') {
             steps {
-                sh 'echo "Deploying the application..."'
-                sh "docker run -d -p 8080:80 simple-web-app:${BUILD_NUMBER}"
+                script {
+                    // Push the Docker image to Docker Hub
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub_id') {
+                        def imageName = "simple-web-app:${env.BUILD_NUMBER}"
+                        docker.image(imageName).push()
+                    }
+                }
             }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    // Deploy the Docker container
+                    def containerName = "simple-web-app-container-${env.BUILD_NUMBER}"
+                    def imageName = "simple-web-app:${env.BUILD_NUMBER}"
+                    sh "docker run -d -p 8080:80 --name ${containerName} ${imageName}"
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Clean up resources
+            sh "docker rm -f ${containerName}"
         }
     }
 }
